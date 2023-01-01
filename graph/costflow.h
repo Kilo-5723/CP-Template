@@ -1,4 +1,4 @@
-#pragma once
+// #pragma once
 
 #include <algorithm>
 #include <optional>
@@ -50,9 +50,9 @@ struct CostFlow {
     int num_edges = 0;
     for (const auto &e : edges) {
       eid[e.from].push_back(num_edges++);
-      edge.push_back({e.from, e.to, e.cost, e.cap});
-      eid[e.from].push_back(num_edges++);
-      edge.push_back({e.to, e.from, -e.cost, 0});
+      edge.push_back({e.from, e.to, e.cost, e.cap - e.flow});
+      eid[e.to].push_back(num_edges++);
+      edge.push_back({e.to, e.from, -e.cost, e.flow});
     }
   }
   std::vector<cost_t> dis;
@@ -68,6 +68,7 @@ struct CostFlow {
     inque[s] = true;
     while (que.size()) {
       int u = que.front();
+      // cerr << 'u' << ' ' << u << endl;
       que.pop();
       inque[u] = false;
       for (auto i : eid[u]) {
@@ -90,11 +91,11 @@ struct CostFlow {
     while (spfa(s, t)) {
       flow_t detf = inf_flow;
       cost_t detc = 0;
-      for (int u = t, i = pre[i]; u != s; u = edge[i].from, i = pre[u]) {
+      for (int u = t, i = pre[u]; u != s; u = edge[i].from, i = pre[u]) {
         detf = std::min(detf, edge[i].cap);
         detc += edge[i].cost;
       }
-      for (int u = t, i = pre[i]; u != s; u = edge[i].from, i = pre[u]) {
+      for (int u = t, i = pre[u]; u != s; u = edge[i].from, i = pre[u]) {
         edge[i].cap -= detf;
         edge[i ^ 1].cap += detf;
       }
@@ -123,8 +124,8 @@ struct Processor {
   std::vector<flow_t> excess;
   void init(std::vector<CostEdge> &edges) {
     int n = num_node(edges);
-    flag.clear();
-    flag.reserve(edges.size());
+    neg.clear();
+    neg.reserve(edges.size());
     low.clear();
     low.reserve(edges.size());
     excess.assign(n + 1, 0);
@@ -152,7 +153,7 @@ struct Processor {
       low.pop_back();
     }
   }
-  std::vector<flow_t> rmv_neg(std::vector<CostEdge> &edges) {
+  void rmv_neg(std::vector<CostEdge> &edges) {
     for (auto &e : edges) {
       neg.push_back(e.cost < 0);
       if (e.cost < 0) {
@@ -167,72 +168,75 @@ struct Processor {
       }
     }
   }
-  void add_neg(std::vector<CostEdge> &edges) {
-    reverse(neg.begin(), neg.end());
-    for (auto &e : edges) {
-      neg.push_back(e.cost < 0);
-      if (e.cost < 0) {
-        excess[e.from] -= e.cap - e.flow;
-        excess[e.to] += e.cap - e.flow;
-        e.flow = e.cap;
-      }
-      if (e.cost > 0) {
-        excess[e.from] += e.flow;
-        excess[e.to] -= e.flow;
-        e.flow = 0;
-      }
-    }
+};
+
+bool excess_flow(std::vector<CostEdge> &edges, const vector<flow_t> &excess) {
+  int n = num_node(edges), m = edges.size();
+  for (int i = 1; i <= n; i++) {
+    if (excess[i] > 0)
+      edges.push_back({.from = n + 1, .to = i, .cost = 0, .cap = excess[i]});
+    if (excess[i] < 0)
+      edges.push_back({.from = i, .to = n + 2, .cost = 0, .cap = -excess[i]});
   }
+  CostFlow g;
+  g.build(edges);
+  g.maxflow(n + 1, n + 2);
+  edges = g.to_edge();
+  for (int i = m; i < edges.size(); i++)
+    if (edges[i].flow != edges[i].cap) return false;
+  edges.resize(m);
+  return true;
+}
+std::optional<std::pair<flow_t, cost_t>> feasible_flow(
+    std::vector<CostEdge> &edges, int s = 0, int t = 0) {
+  if (s && t) edges.push_back({.from = t, .to = s, .cost = 0, .cap = inf_flow});
+  Processor p;
+  p.init(edges);
+  p.rmv_low(edges);
+  p.rmv_neg(edges);
+  if (!excess_flow(edges, p.excess)) return std::nullopt;
+  if (s && t) edges.pop_back();
+  p.add_low(edges);
+  return get_flow(edges, s);
 }
 
-std::optional<std::pair<flow_t, cost_t>>
-feasible_flow(std::vector<CostEdge> &edges, int s = 0, int t = 0) {
-  int n = num_node(edges);
-  Processor p;
-  auto excess = p.process(edges);
-  CostFlow g;
-  for (int i = 1; i <= n; i++) {
-    if (excess[i] > 0)
-      edges.push_back({.from = n + 1, .to = i, .cost = 0, .cap = excess[i]});
-    if (excess[i] < 0)
-      edges.push_back({.from = i, .to = n + 2, .cost = 0, .cap = -excess[i]});
-  }
-  if (s && t) edges.push_back(t, s, 0);
-  g.build(edges);
-  g.maxflow(n + 1, n + 2);
-  edges = g.to_edge();
-  if (s && t) edges.pop_back();
-  for (int i = m; i < edges.size(); i++)
-    if (edges[i].flow != edges[i].cap) return std::nullopt;
-  edges.resize(m);
-  p.recover(edges);
-  return get_flow(edges);
-}
 std::optional<std::pair<flow_t, cost_t>> maximum_flow(
     std::vector<CostEdge> &edges, int s, int t) {
-  int n = num_node(edges);
+  edges.push_back({.from = t, .to = s, .cost = 0, .cap = inf_flow});
   Processor p;
-  auto excess = p.process(edges);
+  p.init(edges);
+  p.rmv_low(edges);
+  p.rmv_neg(edges);
+  if (!excess_flow(edges, p.excess)) return std::nullopt;
+  edges.pop_back();
   CostFlow g;
-  for (int i = 1; i <= n; i++) {
-    if (excess[i] > 0)
-      edges.push_back({.from = n + 1, .to = i, .cost = 0, .cap = excess[i]});
-    if (excess[i] < 0)
-      edges.push_back({.from = i, .to = n + 2, .cost = 0, .cap = -excess[i]});
-  }
-  if (s && t) edges.push_back(t, s, 0);
-  g.build(edges);
-  g.maxflow(n + 1, n + 2);
-  edges = g.to_edge();
-  if (s && t) edges.pop_back();
-  for (int i = m; i < edges.size(); i++)
-    if (edges[i].flow != edges[i].cap) return std::nullopt;
-  edges.resize(m);
   g.build(edges);
   g.maxflow(s, t);
   edges = g.to_edge();
-  p.recover(edges);
-  return get_flow(edges);
+  p.add_low(edges);
+  return get_flow(edges, s);
+}
+
+std::optional<std::pair<flow_t, cost_t>> minimum_flow(
+    std::vector<CostEdge> &edges, int s, int t) {
+  edges.push_back({.from = t, .to = s, .cost = 0, .cap = inf_flow});
+  Processor p;
+  p.init(edges);
+  p.rmv_low(edges);
+  p.rmv_neg(edges);
+  if (!excess_flow(edges, p.excess)) return std::nullopt;
+  edges.pop_back();
+  CostFlow g;
+  for (auto &e : edges) e.cost = -e.cost;
+  Processor q;
+  q.rmv_neg(edges);
+  excess_flow(edges, q.excess);
+  g.build(edges);
+  g.maxflow(t, s);
+  edges = g.to_edge();
+  for (auto &e : edges) e.cost = -e.cost;
+  p.add_low(edges);
+  return get_flow(edges, s);
 }
 
 }  // namespace costflow
