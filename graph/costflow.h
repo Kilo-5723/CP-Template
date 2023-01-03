@@ -171,7 +171,7 @@ struct Processor {
   }
 };
 
-bool excess_flow(std::vector<CostEdge> &edges, const vector<flow_t> &excess) {
+bool excess_flow(std::vector<CostEdge> &edges, const std::vector<flow_t> &excess) {
   int n = num_node(edges), m = edges.size();
   for (int i = 1; i <= n; i++) {
     if (excess[i] > 0)
