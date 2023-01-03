@@ -92,7 +92,6 @@ struct CostFlow {
       flow_t detf = inf_flow;
       cost_t detc = 0;
       for (int u = t, i = pre[u]; u != s; u = edge[i].from, i = pre[u]) {
-        // cerr << "c " << u << endl;
         detf = std::min(detf, edge[i].cap);
         detc += edge[i].cost;
       }
@@ -171,7 +170,8 @@ struct Processor {
   }
 };
 
-bool excess_flow(std::vector<CostEdge> &edges, const std::vector<flow_t> &excess) {
+bool excess_flow(std::vector<CostEdge> &edges,
+                 const std::vector<flow_t> &excess) {
   int n = num_node(edges), m = edges.size();
   for (int i = 1; i <= n; i++) {
     if (excess[i] > 0)
