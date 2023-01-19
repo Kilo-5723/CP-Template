@@ -188,6 +188,7 @@ bool excess_flow(std::vector<CostEdge> &edges,
   edges.resize(m);
   return true;
 }
+
 std::optional<std::pair<flow_t, cost_t>> feasible_flow(
     std::vector<CostEdge> &edges, int s = 0, int t = 0) {
   if (s && t) edges.push_back({.from = t, .to = s, .cost = 0, .cap = inf_flow});
