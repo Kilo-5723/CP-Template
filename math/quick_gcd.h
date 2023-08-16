@@ -1,16 +1,11 @@
-unsigned int gcd(unsigned int u, unsigned int v) {
-  int shift;
-  if (u == 0) return v;
-  if (v == 0) return u;
-  shift = __builtin_ctz(u | v);
-  u >>= __builtin_ctz(u);
-  do {
-    unsigned m;
-    v >>= __builtin_ctz(v);
-    v -= u;
-    m = (int)v >> 31;
-    u += v & m;
-    v = (v + m) ^ m;
-  } while (v != 0);
-  return u * u << shift * 2;
+
+unsigned long long gcd(unsigned long long a, unsigned long long b) {
+  int shift = __builtin_ctzll(a | b);
+  b >>= __builtin_ctzll(b);
+  while (a) {
+    a >>= __builtin_ctzll(a);
+    if (a < b) swap(a, b);
+    a -= b;
+  }
+  return b << shift;
 }

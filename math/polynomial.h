@@ -4,10 +4,9 @@
 #include <complex>
 #include <vector>
 
-const long long mod = 998244353;
-
 namespace polynomial {
 
+const long long mod = 998244353;
 typedef std::complex<long double> cplx;
 
 const long double pi = std::acos((long double)-1.0);
