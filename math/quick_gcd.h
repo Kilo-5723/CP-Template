@@ -1,3 +1,5 @@
+#include <bits/stdc++.h>
+using namespace std;
 
 unsigned long long gcd(unsigned long long a, unsigned long long b) {
   int shift = __builtin_ctzll(a | b);

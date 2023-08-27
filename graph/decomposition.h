@@ -1,3 +1,5 @@
+#include <bits/stdc++.h>
+using namespace std;
 struct graph {
   vector<vector<int>> e, r;
   graph(int n) {
@@ -22,7 +24,7 @@ struct graph {
     for (auto v : r[u])
       if (!col[v]) color(v, u, c);
   }
-  vector<int> decompo() {
+  vector<int> decomp() {
     vis.assign(e.size(), false);
     ord.clear();
     for (int i = 1; i < e.size(); i++)

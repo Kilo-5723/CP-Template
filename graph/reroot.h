@@ -1,4 +1,6 @@
-
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
 struct graph {
   vector<vector<int>> e;
   ll k, c;
