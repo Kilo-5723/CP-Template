@@ -1,3 +1,6 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
 
 const int alpha = 26;
 struct sam {

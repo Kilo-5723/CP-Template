@@ -1,3 +1,5 @@
+#include <bits/stdc++.h>
+using namespace std;
 typedef long long ll;
 typedef long double ld;
 struct cplx {
@@ -11,7 +13,7 @@ bool operator<(const cplx &a, const cplx &b) {
   return a.x != b.x ? a.x < b.x : a.y < b.y;
 }
 bool operator!=(const cplx &a, const cplx &b) { return a < b || b < a; }
-bool operator==(const cplx &a, const cplx &b) { return !(a == b); }
+bool operator==(const cplx &a, const cplx &b) { return !(a != b); }
 ll dot(const cplx &a, const cplx &b) { return a.x * b.x + a.y * b.y; }
 ll det(const cplx &a, const cplx &b) { return a.x * b.y - a.y * b.x; }
 void diagsort(vector<cplx> &a, cplx o) {

@@ -1,3 +1,6 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
 
 const ll inf = 1e18;
 struct node {
@@ -15,7 +18,7 @@ struct node {
     if (l == r) {
       val = a[l];
       mxm = mnm = {val, l};
-      sum = _abs(val);
+      sum = abs(val);
       return;
     }
     int m = (l + r) / 2;
@@ -28,7 +31,7 @@ struct node {
     if (l == r) {
       val = val + a;
       mxm = mnm = {val, l};
-      sum = _abs(val);
+      sum = abs(val);
       return;
     }
     ls->modify(p, a), rs->modify(p, a);
@@ -62,7 +65,6 @@ struct node {
     return ls->qsum(_l, _r) + rs->qsum(_l, _r);
   }
 };
-
 
 const ll inf = 1e18;
 int ls(int u) { return u << 1; }

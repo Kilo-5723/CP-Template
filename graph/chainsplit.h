@@ -1,4 +1,5 @@
-
+#include <bits/stdc++.h>
+using namespace std;
 struct graph {
   vector<vector<int>> e;
   vector<int> fa, dep, siz, hvs, top, dfn, rnk;
