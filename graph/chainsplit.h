@@ -37,7 +37,7 @@ struct graph {
     for (auto v : e[u])
       if (v != fa[u] && v != hvs[u]) ordfs(v, v);
   }
-  void hvsplit(int rt) {
+  void hvydecomp(int rt) {
     subts(rt, -1, 0);
     tot = 0;
     ordfs(rt, rt);
