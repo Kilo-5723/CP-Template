@@ -1,0 +1,35 @@
+\section{杂项}
+
+\subsection{随机数生成}
+\lstinputlisting{others/rand.h}
+
+\subsection{STL容器+Lambda}
+\lstinputlisting{others/stl.h}
+
+\subsection{子集枚举}
+\lstinputlisting{others/subset.h}
+
+\subsection{二项式反演}
+$$ f(n)=\sum\limits_{i=0}^n\binom{n}{i}g(i) \Longleftrightarrow  g(n)=\sum\limits_{i=0}^n(-1)^{n-i}\binom{n}{i}f(i)$$
+$$ f(n)=\sum\limits_{i=m}^n\binom{n}{i}g(i) \Longleftrightarrow  g(n)=\sum\limits_{i=m}^n(-1)^{n-i}\binom{n}{i}f(i)$$
+$f(n)$: $n$选$i$个；$g(n)$: 恰好$n$个
+$$f(n)=\sum\limits_{i=n}^m\binom{i}{n}g(i)\Longleftrightarrow g(n)=\sum\limits_{i=n}^m(-1)^{i-n}\binom{i}{n}f(i)$$
+$f(n)$: 钦定$n$个；$g(n)$: 恰好$n$个
+
+\subsection{莫比乌斯反演}
+
+$$ f(n)=\sum\limits_{d|n} g(d)\Longleftrightarrow g(n)=\sum\limits_{d|n}\mu(d)f(n/d)$$
+$$ f(n)=\sum\limits_{n|d} g(d)\Longleftrightarrow g(n)=\sum\limits_{n|d}\mu(d/n)f(d)$$
+
+\subsection{容斥原理}
+
+$$\left| \bigcup\limits_{i=1}^n S_i \right| = \sum\limits_{m=1}^n(-1)^{m-1}\sum\limits_{a_i<a_{i+1}}\left|\bigcap\limits_{i=1}^m S_{a_i}\right| $$
+
+$$\left| \bigcap\limits_{i=1}^n S_i \right| = |U|-\left| \bigcup\limits_{i=1}^n \overline{S_i} \right|$$
+
+$$f(S)=\sum\limits_{S\subseteq T}g(T)\Longleftrightarrow g(S)=\sum\limits_{S\subseteq T}(-1)^{|T|-|S|}f(T)$$
+
+\subsection{Min-Max 容斥}
+
+$$\max\limits_{i\in S}x_i = \sum_{T\subseteq S}(-1)^{|T|-1}\min\limits_{j\in T}x_j$$
+$$\min\limits_{i\in S}x_i = \sum_{T\subseteq S}(-1)^{|T|-1}\max\limits_{j\in T}x_j$$

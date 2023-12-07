@@ -8,6 +8,12 @@ struct node {
   int l, r;
   ll val, sum;
   pair<ll, int> mxm, mnm;
+  static node *newnd() {
+    static const int buff = 1000;
+    static node *ptr = new node[buff], *cur = ptr;
+    if (cur == ptr + buff) ptr = new node[buff], cur = ptr;
+    return cur++;
+  }
   void update() {
     sum = ls->sum + rs->sum;
     mxm = max(ls->mxm, rs->mxm);
@@ -65,6 +71,7 @@ struct node {
     return ls->qsum(_l, _r) + rs->qsum(_l, _r);
   }
 };
+auto newnd = node::newnd;
 
 const ll inf = 1e18;
 int ls(int u) { return u << 1; }

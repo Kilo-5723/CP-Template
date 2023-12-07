@@ -2,149 +2,127 @@
 using namespace std;
 const char el = '\n';
 typedef long long ll;
-const ll mod = 1e9 + 7, mul = 157;
-vector<ll> hsh, rhs, powm;
-int n;
-string s;
-ll subhsh(vector<ll> &hsh, int l, int r) {
-  return ((hsh[r] - powm[r - l] * hsh[l]) % mod + mod) % mod;
-}
-bool comp(int p, int q) {
-  int l = 0, r = q - p;
-  while (r - l > 1) {
-    int m = (l + r) / 2;
-    if (subhsh(hsh, p, p + m) == subhsh(rhs, n - q, n - q + m))
-      l = m;
-    else
-      r = m;
+const ll mod1 = 1e9 + 7, mod2 = 1e9 + 9;
+struct graph {
+  vector<vector<pair<int, int>>> e;
+  graph(int n) : e(n + 1) {}
+  void adde(int u, int v, int w) { e[u].push_back({v, w}); }
+  bool check() {
+    vector<int> deg(e.size());
+    for (auto &ed : e)
+      for (auto &[to, wt] : ed) deg[to]++;
+    for (int i = 1; i < e.size(); i++)
+      if (deg[i] != e[i].size()) return false;
+    return true;
   }
-  // cout << p << ' ' << q << ' ' << r << ' ' << s[p + l] << ' ' << s[q - r] << el;
-  return s[p + l] < s[q - r];
-}
-int main() {
-  ios::sync_with_stdio(false);
-  cin.tie(0);
-  cout << setprecision(15);
-  cin >> n;
-  cin >> s;
-  powm = {1};
-  for (auto ch : s) powm.push_back(powm.back() * mul % mod);
-  hsh = {0};
-  for (auto ch : s) hsh.push_back((hsh.back() * mul + ch) % mod);
-  reverse(s.begin(), s.end());
-  rhs = {0};
-  for (auto ch : s) rhs.push_back((rhs.back() * mul + ch) % mod);
-  reverse(s.begin(), s.end());
-  int p = 0, q = n;
-  while (p < q)
-    if (comp(p, q))
-      cout << s[p++];
-    else
-      cout << s[--q];
-  cout << el;
-  return 0;
-}
+  void euler(int u, vector<int> &res) {
+    while (e[u].size()) {
+      auto [v, w] = e[u].back();
+      e[u].pop_back();
+      euler(v, res);
+      res.push_back(w);
+    }
+  }
+};
+struct hsh {
+  static const int k = 3;
+  array<ll, k> a;
+};
+const hsh zero{0, 0, 0}, one{1, 1, 1}, mul{31, 57, 71},
+    mod{998244353, 1e9 + 7, 1e9 + 9};
 
-#include <bits/stdc++.h>
-using namespace std;
-const char el = '\n';
-typedef long long ll;
-const int alpha = 26;
-const int thr = 500;
-struct node {
-  array<node *, alpha> ch;
-  int cnt;
-  node() : cnt(0) { ch.fill(NULL); }
-};
-void add(node *u, const string &s) {
-  for (auto c : s) {
-    c -= 'a';
-    if (!u->ch[c]) u->ch[c] = new node();
-    u = u->ch[c];
-    u->cnt++;
+const int mul1 = 31, mul2 = 157;
+pair<ll, ll> pmul(int n) {
+  static vector<pair<ll, ll>> res = {{1, 1}};
+  while (res.size() <= n) {
+    auto [p, q] = res.back();
+    res.push_back({p * mul1 % mod1, q * mul2 % mod2});
   }
+  return res[n];
 }
-pair<node *, ll> run(node *u, const string &s) {
-  ll res = 0;
-  for (auto c : s) {
-    c -= 'a';
-    if (!u->ch[c]) return {NULL, res};
-    u = u->ch[c];
-    res += u->cnt;
+struct hshstr {
+  vector<pair<ll, ll>> hsh;
+  hshstr(string s = "") {
+    hsh.push_back({0, 0});
+    for (auto c : s) {
+      auto [p, q] = hsh.back();
+      hsh.push_back({(p * mul1 + c) % mod1, (q * mul2 + c) % mod2});
+    }
   }
-  return {u, res};
-}
-const ll mod = 1e9 + 7, mul = 307;
-struct hstr {
-  vector<ll> pre;
-  static vector<ll> pow;
-  hstr(string s = "") {
-    pre = {0};
-    for (auto c : s) pre.push_back((pre.back() * mul + c) % mod);
-    while (pow.size() <= s.size()) pow.push_back(pow.back() * mul % mod);
+  pair<ll, ll> hash(int l, int r) {
+    auto [p1, q1] = hsh[l];
+    auto [p2, q2] = hsh[r];
+    auto [mp, mq] = pmul(r - l);
+    return {(p1 * mp - p2 + mod1) % mod1, (q1 * mq - q2 + mod2) % mod2};
   }
-  ll hash(int l, int r) {
-    return ((pre[r] - pre[l] * pow[r - l]) % mod + mod) % mod;
-  }
-  int size() { return pre.size() - 1; }
 };
-vector<ll> hstr::pow = {1};
-pair<int, bool> calc(hstr &a, hstr &b, int p) {
-  int q = p + b.size();
-  if (q <= a.size() && a.hash(p, q) == b.pre.back()) return {q, true};
-  int res;
-  int l = 0, r = min(b.size(), a.size() + 1 - p);
-  while (r - l > 1) {
-    int m = (l + r) / 2;
-    if (a.hash(p, p + m) != b.hash(0, m))
-      r = m;
-    else
-      l = m;
+optional<pair<vector<int>, vector<int>>> solve(vector<hshstr> &a,
+                                               vector<hshstr> &b, int n,
+                                               int m) {
+  map<pair<ll, ll>, int> id1, id2;
+  int k = 0;
+  for (auto &s : a) {
+    pair<ll, ll> l = s.hash(0, m), r = s.hash(m, n);
+    if (!id1.count(l)) id1[l] = ++k;
+    if (!id2.count(r)) id2[r] = ++k;
   }
-  return {p + l, false};
+  for (auto &s : b) {
+    pair<ll, ll> l = s.hash(0, n - m), r = s.hash(n - m, n);
+    if (!id2.count(l)) return nullopt;
+    if (!id1.count(r)) return nullopt;
+  }
+  graph g(k);
+  int t = 0;
+  for (auto &s : a) {
+    pair<ll, ll> l = s.hash(0, m), r = s.hash(m, n);
+    g.adde(id1[l], id2[r], ++t);
+  }
+  t = 0;
+  for (auto &s : b) {
+    pair<ll, ll> l = s.hash(0, n - m), r = s.hash(n - m, n);
+    g.adde(id2[l], id1[r], ++t);
+  }
+  vector<int> res;
+  if (!g.check()) return nullopt;
+  g.euler(1, res);
+  if (res.size() < 2 * a.size()) return nullopt;
+  reverse(res.begin(), res.end());
+  vector<int> p, q;
+  for (int i = 0; i < res.size(); i += 2) p.push_back(res[i]);
+  for (int i = 1; i < res.size(); i += 2) q.push_back(res[i]);
+  return pair<vector<int>, vector<int>>{p, q};
 }
 int main() {
   ios::sync_with_stdio(false);
   cin.tie(0);
   cout << setprecision(15);
-  int n, m, q;
-  cin >> n;
-  vector<string> a(n);
-  for (auto &v : a) cin >> v;
-  cin >> m;
-  vector<string> b(m);
-  for (auto &v : b) cin >> v;
-  node *rt = new node();
-  vector<hstr> s, t;
-  for (auto v : a)
-    if (v.size() > thr)
-      s.push_back(hstr(v));
-    else
-      add(rt, v);
-  for (auto v : b) t.push_back(hstr(v));
-  cin >> q;
-  while (q--) {
-    int k;
-    cin >> k;
-    vector<int> c(k);
-    for (auto &v : c) cin >> v, v--;
-    ll ans = 0;
-    node *u = rt;
-    for (auto v : c) {
-      auto [ptr, val] = run(u, b[v]);
-      u = ptr, ans += val;
-      if (u == NULL) break;
+  int tt;
+  cin >> tt;
+  while (tt--) {
+    int n, m;
+    cin >> n >> m;
+    vector<hshstr> a(n), b(n);
+    for (auto &v : a) {
+      string s;
+      cin >> s;
+      v = hshstr(s);
     }
-    for (auto &u : s) {
-      int p = 0;
-      for (auto &v : c) {
-        auto [q, flg] = calc(u, t[v], p);
-        p = q;
-        if (!flg) break;
+    for (auto &v : b) {
+      string s;
+      cin >> s;
+      v = hshstr(s);
+    }
+    bool flg = false;
+    for (int i = 0; i < m; i++)
+      if (auto res = solve(a, b, m, i)) {
+        flg = true;
+        for (auto v : res->first) cout << v << ' ';
+        cout << el;
+        for (auto v : res->second) cout << v << ' ';
+        cout << el;
+        break;
       }
-      ans += p;
-    }
-    cout << ans << el;
+    if (!flg) cout << -1 << el;
   }
   return 0;
 }
