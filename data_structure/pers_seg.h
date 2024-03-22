@@ -1,3 +1,4 @@
+// ver 2.0
 struct node {
   int l, r;
   node *ls, *rs;
