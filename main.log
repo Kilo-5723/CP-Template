@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999993 (TeX Live 2022/dev/Debian) (preloaded format=xelatex 2023.6.30)  1 DEC 2023 09:23
+This is XeTeX, Version 3.141592653-2.6-0.999993 (TeX Live 2022/dev/Debian) (preloaded format=xelatex 2023.6.30)  13 MAR 2024 02:34
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -683,17 +683,17 @@ Package fontspec Info: Font family 'FandolFang-Regular(0)' created for font
 (fontspec)             <->"[FandolFang-Regular.otf]/OT:language=dflt;"
 (fontspec)             - 'small caps'  (m/sc) with NFSS spec.: 
 
-(./data_structure/cartesian.h) (./data_structure/lct.h) [1] (./data_structure/lichao.h [2]) (./data_structure/pers_seg.h) (./data_structure/range.h [3]) (./data_structure/round_cube_tree.h [4]) (./data_structure/segment_tree.h [5]) (./data_structure/treap.h [6] [7]) (./data_structure/trie.h) (./data_structure/virtual_tree.h [8])) (./game.tex (./game/chess.h [9]) (./game/chess.h [10]) (./game/normal.h [11])) (./graph.tex (./graph/centroid.h [12] [13]) (./graph/chainsplit.h) (./graph/costflow.h [14] [15] [16]
+(./data_structure/cartesian.h) (./data_structure/lct.h) [1] (./data_structure/lichao.h [2]) (./data_structure/pers_seg.h) (./data_structure/range.h [3]) (./data_structure/round_cube_tree.h [4]) (./data_structure/segment_tree.h [5]) (./data_structure/treap.h [6] [7]) (./data_structure/trie.h [8]) (./data_structure/virtual_tree.h)) (./game.tex (./game/chess.h [9]) (./game/chess.h [10]) (./game/normal.h [11] [12])) (./graph.tex (./graph/centroid.h [13]) (./graph/chainsplit.h [14]) (./graph/costflow.h [15] [16]
 Overfull \hbox (3.70143pt too wide) in paragraph at lines 194--195
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
-) (./graph/centroid.h [17]) (./graph/decomposition.h [18]) (./graph/graph.h) (./graph/match.h
+) (./graph/centroid.h [17]) [18] (./graph/decomposition.h) (./graph/graph.h) (./graph/match.h [19]
 Overfull \hbox (3.70143pt too wide) in paragraph at lines 21--22
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
-[19]) (./graph/maxflow_old.h [20] [21]
+) (./graph/maxflow_old.h [20] [21]
 Overfull \hbox (3.70143pt too wide) in paragraph at lines 182--183
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
@@ -703,17 +703,17 @@ Overfull \hbox (3.70143pt too wide) in paragraph at lines 197--198
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
-) (./graph/reroot.h [22]) (./graph/tree_hash.h
+[22]) (./graph/reroot.h) (./graph/tree_hash.h
 Overfull \hbox (8.21834pt too wide) in paragraph at lines 8--10
 [][][][][][][][][][][][][][][][][][][][][][] 
  []
 
-)) (./maths.tex (./math/block.h) (./math/fwt.h [23]
+[23])) (./maths.tex (./math/block.h) (./math/fwt.h [24]
 Overfull \hbox (3.70143pt too wide) in paragraph at lines 73--74
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
-) (./math/gaussian.h [24]
+) (./math/gaussian.h
 Overfull \hbox (3.70143pt too wide) in paragraph at lines 54--55
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
@@ -741,15 +741,15 @@ Overfull \hbox (80.48885pt too wide) in paragraph at lines 57--58
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
-) (./math/polynomial.h [27]) (./math/quick_gcd.h)) (./string.tex [28] (./string/hash.h [29]) (./string/kmp.h) (./string/sam.h [30]) (./string/trie.h)) (./geometry.tex (./geometry/3d.h [31]) (./geometry/circle_convex.h [32]) (./geometry/convex.h [33]) (./geometry/scanline.h [34] [35])) (./others.tex (./others/rand.h [36]) (./others/stl.h) (./others/subset.h)) [37] (./main.aux)
+) (./math/polynomial.h [27] [28]) (./math/quick_gcd.h)) (./string.tex (./string/hash.h [29]) (./string/kmp.h) (./string/sam.h [30]) (./string/trie.h [31])) (./geometry.tex (./geometry/3d.h) (./geometry/circle_convex.h [32]) (./geometry/convex.h [33]) (./geometry/scanline.h [34] [35] [36])) (./others.tex (./others/rand.h) (./others/stl.h) (./others/subset.h)) [37] (./main.aux)
 Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: 8D083FD55874BB6384F8903C5A5544E2;4518.
  ) 
 Here is how much of TeX's memory you used:
- 18049 strings out of 476191
- 363554 string characters out of 5812072
- 1046450 words of memory out of 5000000
- 38362 multiletter control sequences out of 15000+600000
+ 18055 strings out of 476191
+ 363622 string characters out of 5812072
+ 1052450 words of memory out of 5000000
+ 38368 multiletter control sequences out of 15000+600000
  484034 words of font info for 109 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  89i,7n,97p,390b,1946s stack positions out of 5000i,500n,10000p,200000b,80000s
