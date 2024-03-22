@@ -2,6 +2,7 @@ main.aux
 main.log
 main.out
 main.synctex.gz
+main.sync*
 main.toc
 .DS_Store
 texput.log
