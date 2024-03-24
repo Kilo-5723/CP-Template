@@ -26,14 +26,15 @@ bool inside(cplx a, cplx b, cplx c, cplx o) {
 struct edge {  // cyclic chain with a nil node indicating the head
   int to;
   edge *rev;              // rev: reverse edge
-  array<edge *, 2> next;  // next[0]: next next[1]: prev
-  edge(int to) : to(to), rev(nullptr), next({nullptr, nullptr}) {}
+  array<edge *, 2> next;  // next[0]: counter-clockwise; next[1]: clockwise
+  edge(int to) : to(to), rev(NULL), next({NULL, NULL}) {}
   static void *operator new(size_t count) {
-    static edge *begin = nullptr, *end = nullptr;
+    static edge *begin = NULL, *end = NULL;
     if (begin == end) begin = (edge *)malloc(count * 100), end = begin + 100;
     return begin++;
   }
 };
+// generate a new edge uv and reverse edge vu
 pair<edge *, edge *> newedge(int u, int v) {
   auto uv = new edge(v), vu = new edge(u);
   uv->rev = vu, vu->rev = uv;
@@ -56,9 +57,9 @@ edge *next(edge *u, bool d) {
   return ~u->to ? u : u->next[d];
 }
 // find DT of a[ord[l]]..a[ord[r-1]] stored in h
-// return an arbitrary point (low for speed) of convex a[ord[l]]..a[ord[r-1]]
-// edges are sorted counter-clockwise
-// begin is the first edge on halfplane for vertex on the border of convex hull
+// return the lowest point of convex hull a[ord[l]]..a[ord[r-1]] for speed
+// neighbours of a vertex are sorted in a cyclic chain heading by h[u]
+// the begin and end of the chain are both borders of convex hull if applicable
 int divconq(const vector<cplx> &a, const vector<int> &ord, vector<edge *> &h,
             int l, int r) {
   if (r - l <= 2) {
@@ -108,13 +109,13 @@ int divconq(const vector<cplx> &a, const vector<int> &ord, vector<edge *> &h,
   insert(h[v], 1, vu);  // insert vu in the back of h[v]
   // next candidate, flipped by y-axis if f = 1
   auto candidate = [&](int u, int v, edge *uv, int f) {
-    auto e1 = next(uv, f);       // e1 is the candidate, next[1] if flipped
+    auto e1 = next(uv, f);       // e1 is the candidate
     for (auto e2 = next(e1, f);  // e2 is the next candidate
          det(a[v] - a[u], a[e1->to] - a[u]) * (!f - f) > 0 &&  // < 180 degree
          inside(a[u], a[v], a[e1->to], a[e2->to]);  // e2 inside circle u,v,e1
          e1 = e2, e2 = next(e1, f))                 // note that e2 maybe uv
       erase(e1->rev), erase(e1);                    // erase e1
-    return det(a[v] - a[u], a[e1->to] - a[u]) * (!f - f) > 0 ? e1 : nullptr;
+    return det(a[v] - a[u], a[e1->to] - a[u]) * (!f - f) > 0 ? e1 : NULL;
   };
   // update next LR edge as wv, flipped by y-axis if f=1
   auto updatelr = [&](int &u, int v, edge *&uv, edge *&vu, edge *uw, int f) {
