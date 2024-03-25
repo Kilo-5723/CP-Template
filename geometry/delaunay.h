@@ -1,3 +1,4 @@
+
 // ver 2.0
 struct cplx {
   ll x, y;
@@ -23,11 +24,11 @@ bool inside(cplx a, cplx b, cplx c, cplx o) {
   auto d = det(a.x, a.y, a.abs2(), b.x, b.y, b.abs2(), c.x, c.y, c.abs2());
   return d > 0;
 }
-struct edge {  // cyclic chain with a nil node indicating the head
-  int to;
+struct edge {             // cyclic chain with a nil node indicating the head
+  int to;                 // -1 for nil node
   edge *rev;              // rev: reverse edge
   array<edge *, 2> next;  // next[0]: counter-clockwise; next[1]: clockwise
-  edge(int to) : to(to), rev(NULL), next({NULL, NULL}) {}
+  edge(int to = -1) : to(to), rev(NULL), next({NULL, NULL}) {}
   static void *operator new(size_t count) {
     static edge *begin = NULL, *end = NULL;
     if (begin == end) begin = (edge *)malloc(count * 100), end = begin + 100;
@@ -51,8 +52,8 @@ void erase(edge *u) {
   auto v = u->next[1], w = u->next[0];  // v -> u -> w
   v->next[0] = w, w->next[1] = v;
 }
-// next non-nil node
-edge *next(edge *u, bool d) {
+// next non-nil element
+edge *nextelm(edge *u, bool d) {
   u = u->next[d];
   return ~u->to ? u : u->next[d];
 }
@@ -108,17 +109,17 @@ int divconq(const vector<cplx> &a, const vector<int> &ord, vector<edge *> &h,
   insert(h[u], 0, uv);  // insert uv in the front of h[u]
   insert(h[v], 1, vu);  // insert vu in the back of h[v]
   // next candidate, flipped by y-axis if f = 1
-  auto candidate = [&](int u, int v, edge *uv, int f) {
-    auto e1 = next(uv, f);       // e1 is the candidate
-    for (auto e2 = next(e1, f);  // e2 is the next candidate
+  auto candidate = [&](int u, int v, edge *uv, bool f) {
+    auto e1 = nextelm(uv, f);       // e1 is the candidate
+    for (auto e2 = nextelm(e1, f);  // e2 is the next candidate
          det(a[v] - a[u], a[e1->to] - a[u]) * (!f - f) > 0 &&  // < 180 degree
          inside(a[u], a[v], a[e1->to], a[e2->to]);  // e2 inside circle u,v,e1
-         e1 = e2, e2 = next(e1, f))                 // note that e2 maybe uv
+         e1 = e2, e2 = nextelm(e1, f))                 // note that e2 maybe uv
       erase(e1->rev), erase(e1);                    // erase e1
     return det(a[v] - a[u], a[e1->to] - a[u]) * (!f - f) > 0 ? e1 : NULL;
   };
   // update next LR edge as wv, flipped by y-axis if f=1
-  auto updatelr = [&](int &u, int v, edge *&uv, edge *&vu, edge *uw, int f) {
+  auto updatelr = [&](int &u, int v, edge *&uv, edge *&vu, edge *uw, bool f) {
     int w = uw->to;
     auto wu = uw->rev;
     auto [wv, vw] = newedge(w, v);
@@ -156,7 +157,7 @@ vector<vector<int>> delaunay(const vector<cplx> &a) {
   iota(ord.begin(), ord.end(), 0);
   sort(ord.begin(), ord.end(), [&](int i, int j) { return a[i] < a[j]; });
   vector<edge *> h(n);
-  for (auto &e : h) e = new edge(-1), e->next = {e, e};
+  for (auto &e : h) e = new edge(), e->next = {e, e};
   divconq(a, ord, h, 0, n);
   vector<vector<int>> res(n);
   for (int i = 0; i < n; i++)
