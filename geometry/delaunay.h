@@ -75,7 +75,7 @@ int divconq(const vector<cplx> &a, const vector<int> &ord, vector<edge *> &h,
       w = a[u].y < a[v].y ? u : v;                 // low point of convex
   // find neighbour of u lower than line uv (current LR-edge)
   // f = 0: not flipped, 1: fliped by y-axis to handle mirror situation
-  auto lower = [&](int u, int v, int f) -> optional<int> {
+  auto lower = [&](int u, int v, bool f) -> optional<int> {
     for (auto e = h[u]->next[0]; e != h[u]; e = e->next[0]) {
       auto w = e->to;
       auto d = det(a[u] - a[v], a[w] - a[v]) * (!f - f);  // * -1 if flipped
