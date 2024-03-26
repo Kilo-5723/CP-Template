@@ -1,4 +1,4 @@
-// ver 2.0
+// ver 1.5
 struct node {
   int l, r;
   node *ls, *rs;
