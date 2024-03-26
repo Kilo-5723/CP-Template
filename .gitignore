@@ -4,5 +4,6 @@ main.out
 main.synctex.gz
 main.sync*
 main.toc
+main.pdf
 .DS_Store
 texput.log
