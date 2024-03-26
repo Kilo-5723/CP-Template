@@ -1,4 +1,3 @@
-
 // ver 2.0
 struct cplx {
   ll x, y;
@@ -24,6 +23,10 @@ bool inside(cplx a, cplx b, cplx c, cplx o) {
   auto d = det(a.x, a.y, a.abs2(), b.x, b.y, b.abs2(), c.x, c.y, c.abs2());
   return d > 0;
 }
+//         +-------------------------------+
+//         |                               |
+//         v                               v
+// head = nil <--> edge1 <--> edge2 <--> edge3
 struct edge {             // cyclic chain with a nil node indicating the head
   int to;                 // -1 for nil node
   edge *rev;              // rev: reverse edge
@@ -114,7 +117,7 @@ int divconq(const vector<cplx> &a, const vector<int> &ord, vector<edge *> &h,
     for (auto e2 = nextelm(e1, f);  // e2 is the next candidate
          det(a[v] - a[u], a[e1->to] - a[u]) * (!f - f) > 0 &&  // < 180 degree
          inside(a[u], a[v], a[e1->to], a[e2->to]);  // e2 inside circle u,v,e1
-         e1 = e2, e2 = nextelm(e1, f))                 // note that e2 maybe uv
+         e1 = e2, e2 = nextelm(e1, f))              // note that e2 maybe uv
       erase(e1->rev), erase(e1);                    // erase e1
     return det(a[v] - a[u], a[e1->to] - a[u]) * (!f - f) > 0 ? e1 : NULL;
   };
