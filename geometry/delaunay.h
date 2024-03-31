@@ -37,28 +37,28 @@ struct edge {             // cyclic chain with a nil node indicating the head
     if (begin == end) begin = (edge *)malloc(count * 100), end = begin + 100;
     return begin++;
   }
+  // insert this in direction d of u
+  void insert(edge *u, bool d) {
+    auto v = u->next[d];  // u -> this -> v
+    u->next[d] = this, this->next[!d] = u;
+    this->next[d] = v, v->next[!d] = this;
+  }
+  // erase this
+  void erase() {
+    auto u = this->next[1], v = this->next[0];  // v -> u -> w
+    u->next[0] = v, v->next[1] = u;
+  }
+  // next non-nil element in direction d of this (nil if not found)
+  edge *nextelm(bool d) {
+    auto u = this->next[d];
+    return ~u->to ? u : u->next[d];
+  }
 };
 // generate a new edge uv and reverse edge vu
 pair<edge *, edge *> newedge(int u, int v) {
   auto uv = new edge(v), vu = new edge(u);
   uv->rev = vu, vu->rev = uv;
   return {uv, vu};
-}
-// insert v in direction d of u
-void insert(edge *u, bool d, edge *v) {
-  auto w = u->next[d];  // u -> v -> w
-  u->next[d] = v, v->next[!d] = u;
-  v->next[d] = w, w->next[!d] = v;
-}
-// erase u
-void erase(edge *u) {
-  auto v = u->next[1], w = u->next[0];  // v -> u -> w
-  v->next[0] = w, w->next[1] = v;
-}
-// next non-nil element
-edge *nextelm(edge *u, bool d) {
-  u = u->next[d];
-  return ~u->to ? u : u->next[d];
 }
 // find DT of a[ord[l]]..a[ord[r-1]] stored in h
 // return the lowest point of convex hull a[ord[l]]..a[ord[r-1]] for speed
@@ -70,7 +70,7 @@ int divconq(const vector<cplx> &a, const vector<int> &ord, vector<edge *> &h,
     if (r - l == 1) return ord[l];  // return the only point of convex
     auto u = ord[l], v = ord[l + 1];
     auto [uv, vu] = newedge(u, v);
-    insert(h[u], 0, uv), insert(h[v], 0, vu);
+    uv->insert(h[u], 0), vu->insert(h[v], 0);
     return a[u].y < a[v].y ? u : v;  // return low point of convex
   }
   int u = divconq(a, ord, h, l, l + (r - l) / 2),  // low point of left convex
@@ -109,16 +109,16 @@ int divconq(const vector<cplx> &a, const vector<int> &ord, vector<edge *> &h,
   }
   // insert base LR-edge, note that uv is the first edge of u and last of v
   auto [uv, vu] = newedge(u, v);
-  insert(h[u], 0, uv);  // insert uv in the front of h[u]
-  insert(h[v], 1, vu);  // insert vu in the back of h[v]
+  uv->insert(h[u], 0);  // insert uv in the front of h[u]
+  vu->insert(h[v], 1);  // insert vu in the back of h[v]
   // next candidate, flipped by y-axis if f = 1
   auto candidate = [&](int u, int v, edge *uv, bool f) {
-    auto e1 = nextelm(uv, f);       // e1 is the candidate
-    for (auto e2 = nextelm(e1, f);  // e2 is the next candidate
+    auto e1 = uv->nextelm(f);       // e1 is the candidate
+    for (auto e2 = e1->nextelm(f);  // e2 is the next candidate
          det(a[v] - a[u], a[e1->to] - a[u]) * (!f - f) > 0 &&  // < 180 degree
          inside(a[u], a[v], a[e1->to], a[e2->to]);  // e2 inside circle u,v,e1
-         e1 = e2, e2 = nextelm(e1, f))              // note that e2 maybe uv
-      erase(e1->rev), erase(e1);                    // erase e1
+         e1 = e2, e2 = e1->nextelm(f))              // note that e2 maybe uv
+      e1->rev->erase(), e1->erase();                // erase e1
     return det(a[v] - a[u], a[e1->to] - a[u]) * (!f - f) > 0 ? e1 : NULL;
   };
   // update next LR edge as wv, flipped by y-axis if f=1
@@ -126,8 +126,8 @@ int divconq(const vector<cplx> &a, const vector<int> &ord, vector<edge *> &h,
     int w = uw->to;
     auto wu = uw->rev;
     auto [wv, vw] = newedge(w, v);
-    insert(wu, f, wv);
-    insert(vu, !f, vw);
+    wv->insert(wu, f);
+    vw->insert(vu, !f);
     u = w, uv = wv, vu = vw;
   };
   while (true) {
@@ -146,9 +146,9 @@ int divconq(const vector<cplx> &a, const vector<int> &ord, vector<edge *> &h,
         updatelr(u, v, uv, vu, uu2, 0);  // v' not inside uvu', choose u'
   }
   // uv is on the border of convex hull, be the last edge of u and first of v
-  erase(uv), erase(vu);
-  insert(h[u], 1, uv);
-  insert(h[v], 0, vu);
+  uv->erase(), vu->erase();
+  uv->insert(h[u], 1);
+  vu->insert(h[v], 0);
   return w;  // return low point of convex
 }
 // find the deuaunay tranagulation of a vertex set with no repeat nodes
@@ -168,3 +168,6 @@ vector<vector<int>> delaunay(const vector<cplx> &a) {
       res[i].push_back(e->to);
   return res;
 }
+// verified by:
+// https://www.luogu.com.cn/problem/P6362
+// 
