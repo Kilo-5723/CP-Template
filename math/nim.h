@@ -142,3 +142,5 @@ int main() {
   }
   return 0;
 }
+// verified by
+// https://qoj.ac/contest/1388/problem/6549
