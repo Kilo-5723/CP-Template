@@ -171,3 +171,4 @@ vector<vector<int>> delaunay(const vector<cplx> &a) {
 // verified by:
 // https://www.luogu.com.cn/problem/P6362
 // https://codeforces.com/gym/103485/problem/M
+// https://codeforces.com/problemsets/acmsguru/problem/99999/383
