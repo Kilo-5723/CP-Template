@@ -45,7 +45,7 @@ struct edge {             // cyclic chain with a nil node indicating the head
   }
   // erase this
   void erase() {
-    auto u = this->next[1], v = this->next[0];  // v -> u -> w
+    auto u = this->next[1], v = this->next[0];  // u -> this -> v
     u->next[0] = v, v->next[1] = u;
   }
   // next non-nil element in direction d of this (nil if not found)
