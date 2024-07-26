@@ -1,5 +1,5 @@
 const vector<ll> test{2, 325, 9375, 28178, 450775, 9780504, 1795265022};
-// {2,7,61}
+// {2,7,61} for integers
 li qpow(li a, li b, li mod) {
   li res = 1;
   while (b) {
