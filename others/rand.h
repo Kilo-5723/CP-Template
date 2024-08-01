@@ -1,6 +1,5 @@
-
-namespace myrand {
-random_device r;
-default_random_engine e(r());
-std::uniform_int_distribution<int> g(0, 1e9);
-}  // namespace myrand
+// ver 2.0
+random_device rnd;
+default_random_engine eng(rnd());
+uniform_int_distribution<int> gen(0, 1e9);
+// gen(eng)
