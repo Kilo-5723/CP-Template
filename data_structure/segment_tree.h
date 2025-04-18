@@ -1,119 +1,73 @@
-#include <bits/stdc++.h>
-using namespace std;
-typedef long long ll;
-
-const ll inf = 1e18;
-struct node {
-  node *ls, *rs;
-  int l, r;
-  ll val, sum;
-  pair<ll, int> mxm, mnm;
-  static node *newnd() {
-    static const int buff = 1000;
-    static node *ptr = new node[buff], *cur = ptr;
-    if (cur == ptr + buff) ptr = new node[buff], cur = ptr;
-    return cur++;
-  }
-  void update() {
-    sum = ls->sum + rs->sum;
-    mxm = max(ls->mxm, rs->mxm);
-    mnm = min(ls->mnm, rs->mnm);
-  }
-  void build(int _l, int _r, vector<ll> &a) {
-    l = _l, r = _r;
-    if (l == r) {
-      val = a[l];
-      mxm = mnm = {val, l};
-      sum = abs(val);
-      return;
-    }
-    int m = (l + r) / 2;
-    ls = new node(), ls->build(l, m, a);
-    rs = new node(), rs->build(m + 1, r, a);
-    update();
-  }
-  void modify(int p, int a) {
-    if (p < l || p > r) return;
-    if (l == r) {
-      val = val + a;
-      mxm = mnm = {val, l};
-      sum = abs(val);
-      return;
-    }
-    ls->modify(p, a), rs->modify(p, a);
-    update();
-  }
-  int ppos(int _l, int _r) {
-    if (_r < l || _l > r) return -1;
-    if (_l <= l && _r >= r) {
-      if (mxm.first < 0) return -1;
-      if (l == r) return l;
-    }
-    auto res = ls->ppos(_l, _r);
-    if (~res)
-      return res;
-    else
-      return rs->ppos(_l, _r);
-  }
-  pair<ll, int> qmxm(int _l, int _r) {
-    if (_r < l || _l > r) return {-inf, -1};
-    if (_l <= l && _r >= r) return mxm;
-    return max(ls->qmxm(_l, _r), rs->qmxm(_l, _r));
-  }
-  pair<ll, int> qmnm(int _l, int _r) {
-    if (_r < l || _l > r) return {inf, -1};
-    if (_l <= l && _r >= r) return mnm;
-    return min(ls->qmnm(_l, _r), rs->qmnm(_l, _r));
-  }
-  ll qsum(int _l, int _r) {
-    if (_r < l || _l > r) return 0;
-    if (_l <= l && _r >= r) return sum;
-    return ls->qsum(_l, _r) + rs->qsum(_l, _r);
-  }
-};
-auto newnd = node::newnd;
-
-const ll inf = 1e18;
-int ls(int u) { return u << 1; }
-int rs(int u) { return u << 1 | 1; }
+template <class val_t, class tag_t, auto unit, auto nil, auto mul, auto add,
+          auto comb>
 struct segtree {
-  vector<ll> mnm;
-  int l, r;
-  void build(int l_, int r_) {
-    l = l_, r = r_;
-    int k = 1;
-    while (k < r - l + 1) k <<= 1;
-    mnm.resize(k << 1);
+  segtree() {}
+  struct node {
+    node *ls, *rs;
+    int l, r;
+    val_t val;
+    tag_t tag;
+    node(int l, int r)
+        : ls(NULL), rs(NULL), l(l), r(r), val(unit()), tag(nil()) {}
+    static void *operator new(size_t count) {
+      static node *begin = nullptr, *end = nullptr;
+      if (begin == end)
+        begin = (node *)malloc(count * 1000), end = begin + 1000;
+      return begin++;
+    }
+  };
+  node *rt;
+  void init(int n) { init(n + 1, unit()); }
+  void init(vector<val_t> a) {
+    assert(a.size() > 0);
+    auto build = [&](auto &&self, int l, int r) -> node * {
+      auto u = new node(l, r);
+      if (r - l == 1) {
+        u->val = a[l];
+      } else {
+        u->ls = self(self, l, l + r >> 1);
+        u->rs = self(self, l + r >> 1, r);
+        update(u);
+      }
+      return u;
+    };
+    rt = build(build, 0, a.size());
   }
-  void update(int u) { mnm[u] = min(mnm[ls(u)], mnm[rs(u)]); }
-  void init(int mode, int l = -1, int r = -1, int u = 1) {
-    if (!~l) l = this->l, r = this->r;
-    if (l == r) {
-      mnm[u] = (~mode ? mode ? inf : l : -l);
+  void addtag(node *u, tag_t tag) {
+    u->val = add(u->val, tag), u->tag = comb(u->tag, tag);
+  }
+  void pushdown(node *u) {
+    if (u->tag != nil())
+      addtag(u->ls, u->tag), addtag(u->rs, u->tag), u->tag = nil();
+  }
+  void update(node *u) { u->val = mul(u->ls->val, u->rs->val); }
+  void modify(node *u, int p, val_t v) {
+    if (p < u->l || p >= u->r) return;
+    if (u->r - u->l == 1) {
+      u->val = v;
       return;
     }
-    int m = l + (r - l) / 2;
-    init(mode, l, m, ls(u));
-    init(mode, m + 1, r, rs(u));
+    pushdown(u);
+    modify(u->ls, p, v), modify(u->rs, p, v);
     update(u);
   }
-  void modify(int p, ll a, int l = -1, int r = -1, int u = 1) {
-    if (!~l) l = this->l, r = this->r;
-    if (p < l || p > r) return;
-    if (l == r) {
-      mnm[u] = a;
+  void apply(node *u, int l, int r, tag_t tag) {
+    if (r <= u->l || u->r <= l) return;
+    if (l <= u->l && u->r <= r) {
+      addtag(u, tag);
       return;
     }
-    int m = l + (r - l) / 2;
-    modify(p, a, l, m, ls(u));
-    modify(p, a, m + 1, r, rs(u));
+    pushdown(u);
+    apply(u->ls, l, r, tag), apply(u->rs, l, r, tag);
     update(u);
   }
-  ll qmnm(int l_, int r_, int l = -1, int r = -1, int u = 1) {
-    if (!~l) l = this->l, r = this->r;
-    if (r_ < l || l_ > r) return inf;
-    if (l_ <= l && r_ >= r) return mnm[u];
-    int m = l + (r - l) / 2;
-    return min(qmnm(l_, r_, l, m, ls(u)), qmnm(l_, r_, m + 1, r, rs(u)));
+  val_t query(node *u, int l, int r) {
+    if (r <= u->l || u->r <= l) return unit();
+    if (l <= u->l && u->r <= r) return u->val;
+    pushdown(u);
+    return mul(query(u->ls, l, r), query(u->rs, l, r));
   }
+  void modify(int p, val_t v) { modify(rt, p, v); }
+  void apply(int l, int r, tag_t tag) { apply(rt, l, r, tag); }
+  val_t query(int l, int r) { return query(rt, l, r); }
 };
