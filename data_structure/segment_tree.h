@@ -1,7 +1,6 @@
 #include <bits/stdc++.h>
 typedef long long ll;
 using namespace std;
-const ll inf = 1e18;
 
 template <class val_t, class tag_t, auto unit, auto nil, auto mul, auto comb,
           auto add>
